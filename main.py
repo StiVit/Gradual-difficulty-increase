@@ -18,9 +18,9 @@ if __name__ == "__main__":
     neat_population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     neat_population.add_reporter(stats)
-    neat_population.add_reporter(neat.Checkpointer(150))
+    neat_population.add_reporter(neat.Checkpointer(200))
 
-    winner = neat_population.run(eval_genomes, 1)
+    winner = neat_population.run(eval_genomes, 1000)
     main_logger.info(f"NEAT Winner: {winner}")
 
     # Save best model
