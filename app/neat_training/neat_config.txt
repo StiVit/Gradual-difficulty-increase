@@ -1,108 +1,79 @@
 [NEAT]
-# Configuration for the NEAT algorithm
-# Reset the population if all species go extinct
-reset_on_extinction = True
-# Fitness criterion (max or min)
-fitness_criterion = max
-
-# Fitness threshold for early stopping
-fitness_threshold = 100.0
-
-# Number of generations to run
-pop_size = 150
-
-[DefaultGenome]
-# Number of input nodes
-num_inputs = 5
-
-# Number of output nodes
-num_outputs = 2
-
-num_hidden = 1
-
-# Initial connection weight range
-
-# Feed-forward only (no recurrent connections)
-feed_forward = True
-# Coefficient for disjoint genes in the compatibility distance
-compatibility_disjoint_coefficient = 1.0
-compatibility_weight_coefficient = 1.0
-weight_range = [-1.0, 1.0]
-
-# Probability of adding a new node
-node_add_prob = 0.03
-node_delete_prob = 0.01
-
-# Probability of adding a new connection
-conn_add_prob = 0.05
-# Probability of mutating a connection weight
-mutate_weight_prob = 0.8
-
-# Probability of deleting a connection
-conn_delete_prob = 0.02
-
-# Mean value for initial bias
-bias_init_mean = 0.0
-bias_init_stdev = 0.0
-# Probability of replacing a node bias
-bias_replace_rate = 0.1
-# Rate at which biases are mutated
-bias_mutate_rate = 0.1
-# Power of the mutation for biases
-bias_mutate_power = 0.5
-# Maximum value for bias
-bias_max_value = 1.0
-bias_min_value = -1.0
-# Activation function for nodes
-activation_function = sigmoid
-
-# Mean value for initial response
-response_init_mean = 0.0
-response_init_stdev = 0.0
-# Probability of replacing a node response
-response_replace_rate = 0.1
-# Rate at which responses are mutated
-response_mutate_rate = 0.1
-# Power of the mutation for responses
-response_mutate_power = 0.5
-# Maximum value for response
-response_max_value = 1.0
-response_min_value = -1.0
-
-# Rate at which activation functions are mutated
-activation_mutate_rate = 0.1
-# Rate at which aggregation functions are mutated
-aggregation_mutate_rate = 0.1
-# Mean value for initial connection weights
-weight_init_mean = 0.0
-weight_init_stdev = 1.0
-# Probability of replacing a connection weight
-weight_replace_rate = 0.1
-weight_mutate_rate = 0.1
-
-# Power of the mutation for connection weights
-weight_mutate_power = 0.5
-# Maximum value for connection weights
-weight_max_value = 1.0
-# Minimum value for connection weights
-weight_min_value = -1.0
-
-enabled_default = True
-# Rate at which the enabled state of connections is mutated
-enabled_mutate_rate = 0.01
-
-[DefaultReproduction]
-# Population size
-
-# Elitism (number of top genomes to carry over to the next generation)
-elitism = 2
-
-# Probability of mutating a single genome
-
-# Probability of crossing over two genomes
-
-[DefaultSpeciesSet]
-# Compatibility threshold for speciation
-compatibility_threshold = 3.0
+fitness_criterion     = max
+fitness_threshold     = 200
+pop_size              = 2
+reset_on_extinction   = False
 
 [DefaultStagnation]
+species_fitness_func = max
+max_stagnation       = 20
+species_elitism      = 2
+
+[DefaultReproduction]
+elitism            = 2
+survival_threshold = 0.2
+
+[DefaultGenome]
+# node activation options
+activation_default      = sigmoid
+activation_mutate_rate  = 0.0
+activation_options      = sigmoid
+
+# node aggregation options
+aggregation_default     = max
+aggregation_mutate_rate = 0.0
+aggregation_options     = max
+
+# node bias options
+bias_init_mean          = 3.0
+bias_init_stdev         = 1.0
+bias_max_value          = 30.0
+bias_min_value          = -30.0
+bias_mutate_power       = 0.5
+bias_mutate_rate        = 0.7
+bias_replace_rate       = 0.1
+
+# genome compatibility options
+compatibility_disjoint_coefficient = 1.0
+compatibility_weight_coefficient   = 0.5
+
+# connection add/remove rates
+conn_add_prob           = 0.5
+conn_delete_prob        = 0.5
+
+# connection enable options
+enabled_default         = True
+enabled_mutate_rate     = 0.01
+
+feed_forward            = True
+initial_connection      = full_direct
+
+# node add/remove rates
+node_add_prob           = 0.2
+node_delete_prob        = 0.2
+
+# network parameters
+num_hidden              = 0
+num_inputs              = 6
+num_outputs             = 2
+
+# node response options
+response_init_mean      = 1.0
+response_init_stdev     = 0.0
+response_max_value      = 30.0
+response_min_value      = -30.0
+response_mutate_power   = 0.0
+response_mutate_rate    = 0.0
+response_replace_rate   = 0.0
+
+# connection weight options
+weight_init_mean        = 0.0
+weight_init_stdev       = 1.0
+weight_max_value        = 30
+weight_min_value        = -30
+weight_mutate_power     = 0.5
+weight_mutate_rate      = 0.8
+weight_replace_rate     = 0.1
+
+[DefaultSpeciesSet]
+compatibility_threshold = 3.0

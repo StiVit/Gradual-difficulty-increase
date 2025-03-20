@@ -1,7 +1,7 @@
 import math
 
 class Agent:
-    def __init__(self, x, y, speed = 1.0, size = 1.0, sense = 50.0, net = None):
+    def __init__(self, x, y, speed = 1.0, size = 1.0, sense = 500.0, net = None):
         self.x = x
         self.y = y
         self.speed = speed
@@ -9,6 +9,7 @@ class Agent:
         self.sense = sense
         self.energy = 100 # Initial energy
         self.net = net
+        self.eaten = False
 
     def move(self, direction):
         dx, dy = math.cos(direction) * self.speed, math.sin(direction) * self.speed
