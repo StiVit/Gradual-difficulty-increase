@@ -11,7 +11,7 @@ class Plane:
         self.food = self.spawn_food(num_food)
     
     def spawn_food(self, num_food):
-        return [(random.uniform(0, self.width), random.uniform(0, self.height)) for _ in range(num_food)]
+        return [(random.randint(0, self.width), random.randint(0, self.height)) for _ in range(num_food)]
     
     def show_food(self):
         import matplotlib.pyplot as plt

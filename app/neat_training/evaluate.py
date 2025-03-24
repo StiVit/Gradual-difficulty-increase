@@ -1,5 +1,5 @@
 """
-Input: Agent Position, closest food position, remaining energy
+Input: Agent Position, closest food position, remaining energy, distance to the closest food
 Output: Movement direction
 """
 
@@ -13,14 +13,15 @@ from app.utils.logger import get_logger
 evaluation_logger = get_logger("evaluation_logger")
 
 def eval_genomes(genomes, config):
+    n_agents = len(genomes)
     x_plane, y_plane = 1000, 1000
-    plane = Plane(x_plane, y_plane, 100)
+    plane = Plane(x_plane, y_plane, 200)
 
     agents = []
     nets = []
     for genome_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        agent = Agent(x=0, y=random.uniform(0, y_plane))
+        agent = spawn_agent(genome_id, n_agents, x_plane, y_plane)
         genome.fitness = 0
         agents.append((agent, genome_id, genome))
         nets.append(net)
@@ -30,36 +31,70 @@ def eval_genomes(genomes, config):
             fitness = 0
             if agent.energy <= 0:
                 continue
-
+            
+            # Get the closest food (if any) and the closest edge
             food_list = plane.food
             closest_food = sorted(agent.perceive_food(food_list), key=lambda x: agent.distance_to(x))
             if closest_food:
                 closest_food = closest_food[0]
-                # Do the preprocessing of the data to make the inputs fit together nicely
-                inputs = [round(agent.x / x_plane, 6), 
-                          round(agent.y / y_plane, 6), 
-                          round(closest_food[0] / x_plane, 6), 
-                          round(closest_food[1] / y_plane, 6) ,
-                          round(agent.energy / 100, 6), 
-                          round(agent.distance_to(closest_food) / math.sqrt(x_plane**2 + y_plane**2), 6)]
-                output = nets[i].activate(inputs)
-                # evaluation_logger.info(f"Agent: {genome_id}, Inputs: {inputs}, Output: {output}")
-
-                direction = output[0] * 2 * math.pi
-                agent.move(direction)
-
-                if agent.distance_to(closest_food) <= agent.size:
-                    agent.eaten = True
-                    plane.food.remove(closest_food)
-                    fitness += 10 # Reward for eating food
-
-                if agent.distance_to((0, agent.y)) < agent.size and agent.energy > 0 and agent.eaten:
-                    fitness = agent.energy + (100 - len(plane.food)) * 10
-                    evaluation_logger.info(f"Agent {genome_id}: {agent.energy}, {len(plane.food)}")
-                    agent.energy = 0  # Mark agent as finished
-            
             else:
-                direction = random.uniform(0, 1) * 2 * math.pi
-                agent.move(direction)
+                closest_food = (-1, -1)
+            closest_edge = get_closest_edge(agent, x_plane, y_plane)
+
+            # Set all the inputs for the neural network
+            inputs = [int(agent.x), 
+                      int(agent.y), 
+                      int(closest_food[0]), 
+                      int(closest_food[1]),
+                      int(closest_edge[0]),
+                      int(closest_edge[1]),
+                      agent.eaten, 
+                      int(agent.energy)]
+            output = nets[i].activate(inputs)
+            # evaluation_logger.info(f"Agent: {genome_id}, Inputs: {inputs}, Output: {output}")
+
+            direction = get_direction(output)
+            agent.move(direction)
+
+            if agent.distance_to(closest_food) <= agent.size:
+                agent.eaten += 1
+                agent.energy += 10
+                plane.food.remove(closest_food)
+                fitness += 10 # Reward for eating food
+
+            if agent.distance_to(closest_edge) <= agent.size and agent.energy > 0 and agent.eaten:
+                fitness = 100 + agent.energy + agent.eaten * 10
+                evaluation_logger.info(f"Agent {genome_id}: {agent.energy}, {len(plane.food)}")
+                agent.energy = 0  # Mark agent as finished
 
             genome.fitness += fitness
+
+
+def spawn_agent(i, n_agents, x_plane, y_plane):
+    quarter = n_agents // 4
+    match i:
+        case _ if i < quarter:
+            return Agent(0, random.randint(0, y_plane))
+        case _ if i < 2 * quarter:
+            return Agent(x_plane, random.randint(0, y_plane))
+        case _ if i < 3 * quarter:
+            return Agent(random.randint(0, x_plane), 0)
+        case _:
+            return Agent(random.randint(0, x_plane), y_plane)
+        
+
+def get_closest_edge(agent, x_plane, y_plane):
+    edges = [
+        (0, agent.y),  # Left edge
+        (x_plane, agent.y),  # Right edge
+        (agent.x, 0),  # Bottom edge
+        (agent.x, y_plane)  # Top edge
+    ]
+    closest_edge = min(edges, key=lambda edge: agent.distance_to(edge))
+    return closest_edge
+
+
+def get_direction(output):
+    directions = ['l', 'u', 'r', 'd']
+    max_index = output.index(max(output))
+    return directions[max_index]
