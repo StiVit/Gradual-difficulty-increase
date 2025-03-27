@@ -7,7 +7,7 @@ class Agent:
         self.speed = speed
         self.size = size
         self.sense = sense
-        self.energy = 100 # Initial energy
+        self.energy = 1000 # Initial energy
         self.net = net
         self.eaten = 0
 

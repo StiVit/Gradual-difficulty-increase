@@ -5,14 +5,17 @@ Output: Movement direction
 
 import neat
 import random
-import math
 from app.simulation.agent import Agent
 from app.simulation.environment import Plane
 from app.utils.logger import get_logger
+from app.visualization.show_agents import show_agents
 
 evaluation_logger = get_logger("evaluation_logger")
+gen = 0
 
 def eval_genomes(genomes, config):
+    global gen
+    evaluation_logger.debug(f"Active Generation: {gen}")
     n_agents = len(genomes)
     x_plane, y_plane = 1000, 1000
     plane = Plane(x_plane, y_plane, 200)
@@ -25,6 +28,8 @@ def eval_genomes(genomes, config):
         genome.fitness = 0
         agents.append((agent, genome_id, genome))
         nets.append(net)
+
+    show_agents(x_plane, y_plane, agents)
 
     while any(agent.energy > 0 for agent, _, _ in agents):
         for i, (agent, genome_id, genome) in enumerate(agents):
@@ -63,11 +68,14 @@ def eval_genomes(genomes, config):
                 fitness += 10 # Reward for eating food
 
             if agent.distance_to(closest_edge) <= agent.size and agent.energy > 0 and agent.eaten:
-                fitness = 100 + agent.energy + agent.eaten * 10
-                evaluation_logger.info(f"Agent {genome_id}: {agent.energy}, {len(plane.food)}")
+                fitness = 100 + agent.energy // 10 + agent.eaten * 10
+                evaluation_logger.info(f"Agent {genome_id}: E = {agent.energy}, Food Eaten = {agent.eaten}")
                 agent.energy = 0  # Mark agent as finished
-
+            
             genome.fitness += fitness
+    evaluation_logger.info(f"Food left: {len(plane.food)}")
+    gen += 1
+        
 
 
 def spawn_agent(i, n_agents, x_plane, y_plane):

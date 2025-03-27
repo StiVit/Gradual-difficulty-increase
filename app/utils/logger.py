@@ -4,7 +4,7 @@ import os
 def get_logger(name):
     # Create a custom logger
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(logging.DEBUG)  # Set logger level to DEBUG
 
     # Create handlers
     c_handler = logging.StreamHandler()
