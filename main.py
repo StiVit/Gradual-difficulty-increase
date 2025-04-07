@@ -8,8 +8,6 @@ import os
 
 if __name__ == "__main__":
     main_logger = get_logger("main_logger")
-    plane = Plane(1000, 1000, num_food=100)
-    show_food(plane) 
     
     # Run NEAT to train movement
     config_path = "app/neat_training/neat_config.txt"

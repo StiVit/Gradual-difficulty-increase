@@ -5,18 +5,17 @@ creator.create("FitnessMax", base.Fitness, weights=(1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMax)
 
 toolbox = base.Toolbox()
-toolbox.register("attr_speed", random.uniform, 0.5, 2.0)  # Speed range
-toolbox.register("attr_size", random.uniform, 0.5, 3.0)   # Size range
-toolbox.register("attr_sense", random.uniform, 30.0, 100.0) # Sense range
+toolbox.register("attr_speed", random.randint, 1, 5)  # Speed range
+toolbox.register("attr_sense", random.randint, 30, 300) # Sense range
 toolbox.register("individual", tools.initCycle, creator.Individual, 
                  (toolbox.attr_speed, toolbox.attr_size, toolbox.attr_sense), n=1)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 def evaluate(individual):
-    speed, size, sense = individual
+    speed, sense = individual
     # Simulate agent behavior using NEAT-trained movement
     # Compute fitness based on performance
-    return speed * sense - size,
+    return speed * sense,
 
 toolbox.register("evaluate", evaluate)
 toolbox.register("mate", tools.cxBlend, alpha=0.5)

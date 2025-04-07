@@ -9,11 +9,11 @@ pygame.init()
 screen = pygame.display.set_mode((500, 500))
 clock = pygame.time.Clock()
 
-plane = Plane(100, 100, 100)
+plane = Plane(1000, 1000, 200)
 best_traits = run_evolution()
 
 def load_neat(config_path):
-    return neat.Checkpointer.restore_checkpoint("neat-best_model")
+    return neat.Checkpointer.restore_checkpoint("neat_checkpoint-neat_best_model")
 
 neat_model = load_neat("app/neat_training/neat_config.txt")
 agents = [Agent(0, random.randint(0, 50), *best_traits, net=neat_model) for _ in range(20)]

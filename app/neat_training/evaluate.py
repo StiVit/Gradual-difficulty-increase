@@ -8,6 +8,7 @@ import random
 from app.simulation.agent import Agent
 from app.simulation.environment import Plane
 from app.utils.logger import get_logger
+from app.visualization.show_game import show_game
 from app.visualization.show_agents import show_agents
 
 evaluation_logger = get_logger("evaluation_logger")
@@ -24,14 +25,18 @@ def eval_genomes(genomes, config):
     nets = []
     for genome_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        agent = spawn_agent(genome_id, n_agents, x_plane, y_plane)
+        agent = spawn_agent(genome_id%100, n_agents, x_plane, y_plane)
         genome.fitness = 0
         agents.append((agent, genome_id, genome))
         nets.append(net)
 
-    show_agents(x_plane, y_plane, agents)
+    # For the purpose of visualization of the agents on the grid
+    # show_agents(x_plane, y_plane, agents)
 
     while any(agent.energy > 0 for agent, _, _ in agents):
+        if gen == 1:
+            show_game(plane, agents)
+
         for i, (agent, genome_id, genome) in enumerate(agents):
             fitness = 0
             if agent.energy <= 0:
@@ -47,48 +52,45 @@ def eval_genomes(genomes, config):
             closest_edge = get_closest_edge(agent, x_plane, y_plane)
 
             # Set all the inputs for the neural network
-            inputs = [int(agent.x), 
-                      int(agent.y), 
-                      int(closest_food[0]), 
-                      int(closest_food[1]),
-                      int(closest_edge[0]),
-                      int(closest_edge[1]),
+            inputs = [int(agent.x / x_plane * 100), 
+                      int(agent.y / y_plane * 100), 
+                      int(closest_food[0] / x_plane * 100), 
+                      int(closest_food[1] / y_plane * 100),
+                      int(closest_edge[0] / x_plane * 100),
+                      int(closest_edge[1] / y_plane * 100),
                       agent.eaten, 
-                      int(agent.energy)]
+                      int(agent.energy) / 1000 * 100]
             output = nets[i].activate(inputs)
-            # evaluation_logger.info(f"Agent: {genome_id}, Inputs: {inputs}, Output: {output}")
 
             direction = get_direction(output)
-            agent.move(direction)
+            agent.move(direction, x_plane, y_plane)
 
             if agent.distance_to(closest_food) <= agent.size:
-                agent.eaten += 1
-                agent.energy += 10
+                agent.eat()
                 plane.food.remove(closest_food)
                 fitness += 10 # Reward for eating food
 
-            if agent.distance_to(closest_edge) <= agent.size and agent.energy > 0 and agent.eaten:
-                fitness = 100 + agent.energy // 10 + agent.eaten * 10
+            if agent.distance_to(closest_edge)-5 <= agent.size and agent.energy > 0 and agent.eaten:
+                fitness = agent.energy // 10 + agent.eaten * 100
                 evaluation_logger.info(f"Agent {genome_id}: E = {agent.energy}, Food Eaten = {agent.eaten}")
                 agent.energy = 0  # Mark agent as finished
             
             genome.fitness += fitness
     evaluation_logger.info(f"Food left: {len(plane.food)}")
     gen += 1
-        
-
+    
 
 def spawn_agent(i, n_agents, x_plane, y_plane):
     quarter = n_agents // 4
     match i:
         case _ if i < quarter:
-            return Agent(0, random.randint(0, y_plane))
+            return Agent(10, random.randint(10, y_plane-10))
         case _ if i < 2 * quarter:
-            return Agent(x_plane, random.randint(0, y_plane))
+            return Agent(x_plane-10, random.randint(10, y_plane-10))
         case _ if i < 3 * quarter:
-            return Agent(random.randint(0, x_plane), 0)
+            return Agent(random.randint(10, x_plane-10), 10)
         case _:
-            return Agent(random.randint(0, x_plane), y_plane)
+            return Agent(random.randint(10, x_plane-10), y_plane-10)
         
 
 def get_closest_edge(agent, x_plane, y_plane):
