@@ -8,7 +8,7 @@ toolbox = base.Toolbox()
 toolbox.register("attr_speed", random.randint, 1, 5)  # Speed range
 toolbox.register("attr_sense", random.randint, 30, 300) # Sense range
 toolbox.register("individual", tools.initCycle, creator.Individual, 
-                 (toolbox.attr_speed, toolbox.attr_size, toolbox.attr_sense), n=1)
+                 (toolbox.attr_speed, toolbox.attr_sense), n=1)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 def evaluate(individual):

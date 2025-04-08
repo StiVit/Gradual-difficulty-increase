@@ -1,10 +1,11 @@
-from app.simulation.environment import Plane
 from app.neat_training.evaluate import eval_genomes
 from app.genetic_algorithm.train_deap import run_evolution
 from app.utils.logger import get_logger
 from app.visualization.show_food import show_food
+from app.visualization.visualization import visualize_game
 import neat
 import os
+import pickle
 
 if __name__ == "__main__":
     main_logger = get_logger("main_logger")
@@ -22,15 +23,22 @@ if __name__ == "__main__":
     neat_population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     neat_population.add_reporter(stats)
-    neat_population.add_reporter(neat.Checkpointer(10, filename_prefix=os.path.join(checkpoint_dir, "neat_checkpoint_")))
+    neat_population.add_reporter(neat.Checkpointer(50, filename_prefix=os.path.join(checkpoint_dir, "neat_checkpoint_")))
 
-    winner = neat_population.run(eval_genomes, 100)
-    main_logger.info(f"NEAT Winner: {winner}")
-
-    # Save best model
-    checkpoint = neat.Checkpointer()
-    checkpoint.save_checkpoint(neat_population, neat_population.species, neat_population.generation, "neat_best_model")
-
+    best_model_path = "winner.pkl"
+    if os.path.exists(best_model_path):
+        main_logger.info("Best model checkpoint found. Loading model...")
+        # Load the best model from the saved file
+        with open(best_model_path, "rb") as f:
+            winner = pickle.load(f)
+    else:
+        # main_logger.info("No best model checkpoint found. Running NEAT population...")
+        winner = neat_population.run(eval_genomes, 1000)
+        # Save the best model to a file
+        with open(best_model_path, "wb") as f:
+            pickle.dump(winner, f)
+        main_logger.info(f"NEAT Winner: {winner}")
+    visualize_game(winner)
     # Run Genetic Algorithm to evolve traits
     best_traits = run_evolution()
     main_logger.info(f"Best traits: {best_traits}")

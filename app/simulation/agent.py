@@ -1,13 +1,14 @@
 import math
+from app.utils.settings import settings
 
 class Agent:
-    def __init__(self, x, y, speed = 1.0, sense = 50.0, net = None):
+    def __init__(self, x, y, speed = settings.default_speed, sense = settings.default_sense, net = None):
         self.x = x
         self.y = y
         self.speed = speed
         self.sense = sense
         self.size = 1
-        self.energy = 1000 # Initial energy
+        self.energy = settings.default_energy # Initial energy
         self.net = net
         self.eaten = 0
 
@@ -16,9 +17,9 @@ class Agent:
             case 'l':
                 self.x -= self.speed if self.x >= self.speed else 0
             case 'r':
-                self.x += self.speed if self.x <= x_plane - self.speed else 0
+                self.x += self.speed if self.x <= settings.x_plane - self.speed else 0
             case 'u':
-                self.y += self.speed if self.y <= y_plane - self.speed else 0
+                self.y += self.speed if self.y <= settings.y_plane - self.speed else 0
             case 'd':
                 self.y -= self.speed if self.y >= self.speed else 0
         self.energy -= self.speed * max(1, self.sense // 100) # More speed and sensd, more energy consumed
