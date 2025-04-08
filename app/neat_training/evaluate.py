@@ -7,7 +7,8 @@ import neat
 from app.simulation.environment import Plane
 from app.utils.logger import get_logger
 from app.utils.settings import settings
-from app.utils.helpers import spawn_agent, get_closest_edge, get_direction
+from app.utils.helpers import get_closest_edge, get_direction
+from app.utils.spawn_agent import spawn_agent
 
 evaluation_logger = get_logger("evaluation_logger")
 gen = 0

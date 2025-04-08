@@ -1,5 +1,6 @@
 import math
 from app.utils.settings import settings
+from app.utils.helpers import get_closest_edge, get_direction
 
 class Agent:
     def __init__(self, x, y, speed = settings.default_speed, sense = settings.default_sense, net = None):
@@ -36,12 +37,29 @@ class Agent:
             self.energy += 10
     
     def decide_movement(self, plane):
-        # Stand for modification
-        if self.net:
-            food_list = plane.food
-            closest_food = min(food_list, key=lambda food: self.distance_to(food), default=None)
-            if closest_food:
-                inputs = [self.x, self.y, closest_food[0] if closest_food else (-1, -1), self.energy]
-            output = self.net.activate(inputs)
-            direction = output[0] * 2 * math.pi
-            self.move(direction)
+        if self.energy <= 0:
+            return
+        
+        x_plane, y_plane = settings.x_plane, settings.y_plane
+        food_list = plane.food
+        closest_food = sorted(self.perceive_food(food_list), key=lambda x: self.distance_to(x))
+        if closest_food:
+            closest_food = closest_food[0]
+        else:
+            closest_food = (-1, -1)
+        closest_edge = get_closest_edge(self, x_plane, y_plane)
+        inputs = [int(self.x / x_plane * 100), 
+                      int(self.y / y_plane * 100), 
+                      int(closest_food[0] / x_plane * 100), 
+                      int(closest_food[1] / y_plane * 100),
+                      int(closest_edge[0] / x_plane * 100),
+                      int(closest_edge[1] / y_plane * 100),
+                      self.eaten, 
+                      int(self.energy) / 1000 * 100]
+        output = self.net.activate(inputs)
+        direction = get_direction(output)
+        self.move(direction, x_plane, y_plane)
+
+        if self.distance_to(closest_edge)-5 <= self.size and self.energy > 0 and self.eaten:
+            self.energy = 0
+            print("Agent finished iteration")
