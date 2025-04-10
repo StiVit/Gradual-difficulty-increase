@@ -32,7 +32,7 @@ def run_neat():
             winner = pickle.load(f)
     else:
         neat_logger.info("No best model checkpoint found. Running NEAT population...")
-        winner = neat_population.run(eval_genomes, 1000)
+        winner = neat_population.run(eval_genomes, 100)
         # Save the best model to a file
         with open(best_model_path, "wb") as f:
             pickle.dump(winner, f)

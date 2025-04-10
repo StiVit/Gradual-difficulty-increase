@@ -9,6 +9,7 @@ from app.utils.logger import get_logger
 from app.utils.settings import settings
 from app.utils.helpers import get_closest_edge, get_direction
 from app.utils.spawn_agent import spawn_agent
+from app.visualization.show_game import show_game
 
 evaluation_logger = get_logger("evaluation_logger")
 gen = 0
@@ -30,6 +31,8 @@ def eval_genomes(genomes, config):
         nets.append(net)
 
     while any(agent.energy > 0 for agent, _, _ in agents):
+        if gen == 25:
+            show_game(plane, agents)
 
         for i, (agent, genome_id, genome) in enumerate(agents):
             fitness = 0
@@ -46,18 +49,18 @@ def eval_genomes(genomes, config):
             closest_edge = get_closest_edge(agent, x_plane, y_plane)
 
             # Set all the inputs for the neural network
-            inputs = [int(agent.x / x_plane * 100), 
-                      int(agent.y / y_plane * 100), 
-                      int(closest_food[0] / x_plane * 100), 
-                      int(closest_food[1] / y_plane * 100),
-                      int(closest_edge[0] / x_plane * 100),
-                      int(closest_edge[1] / y_plane * 100),
+            inputs = [int(agent.x), 
+                      int(agent.y), 
+                      int(closest_food[0]), 
+                      int(closest_food[1]),
+                      int(closest_edge[0]),
+                      int(closest_edge[1]),
                       agent.eaten, 
-                      int(agent.energy) / 1000 * 100]
+                      int(agent.energy)]
             output = nets[i].activate(inputs)
 
             direction = get_direction(output)
-            agent.move(direction, x_plane, y_plane)
+            agent.move(direction)
 
             if agent.distance_to(closest_food) <= agent.size:
                 agent.eat()

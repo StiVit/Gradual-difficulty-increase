@@ -13,7 +13,7 @@ class Agent:
         self.net = net
         self.eaten = 0
 
-    def move(self, direction, x_plane, y_plane):
+    def move(self, direction):
         match direction:
             case 'l':
                 self.x -= self.speed if self.x >= self.speed else 0
@@ -23,7 +23,7 @@ class Agent:
                 self.y += self.speed if self.y <= settings.y_plane - self.speed else 0
             case 'd':
                 self.y -= self.speed if self.y >= self.speed else 0
-        self.energy -= self.speed * max(1, self.sense // 100) # More speed and sensd, more energy consumed
+        self.energy -= self.speed * max(1, self.sense // 100) # More speed and sense, more energy consumed
 
     def perceive_food(self, food_list):
         return [food for food in food_list if self.distance_to(food) <= self.sense]
@@ -48,17 +48,17 @@ class Agent:
         else:
             closest_food = (-1, -1)
         closest_edge = get_closest_edge(self, x_plane, y_plane)
-        inputs = [int(self.x / x_plane * 100), 
-                      int(self.y / y_plane * 100), 
-                      int(closest_food[0] / x_plane * 100), 
-                      int(closest_food[1] / y_plane * 100),
-                      int(closest_edge[0] / x_plane * 100),
-                      int(closest_edge[1] / y_plane * 100),
+        inputs = [int(self.x), 
+                      int(self.y), 
+                      int(closest_food[0]), 
+                      int(closest_food[1]),
+                      int(closest_edge[0]),
+                      int(closest_edge[1]),
                       self.eaten, 
-                      int(self.energy) / 1000 * 100]
+                      int(self.energy)]
         output = self.net.activate(inputs)
         direction = get_direction(output)
-        self.move(direction, x_plane, y_plane)
+        self.move(direction)
 
         if self.distance_to(closest_edge)-5 <= self.size and self.energy > 0 and self.eaten:
             self.energy = 0
