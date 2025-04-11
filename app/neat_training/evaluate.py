@@ -31,8 +31,8 @@ def eval_genomes(genomes, config):
         nets.append(net)
 
     while any(agent.energy > 0 for agent, _, _ in agents):
-        if gen == 25:
-            show_game(plane, agents)
+        # if gen == 25:
+        #     show_game(plane, agents)
 
         for i, (agent, genome_id, genome) in enumerate(agents):
             fitness = 0
