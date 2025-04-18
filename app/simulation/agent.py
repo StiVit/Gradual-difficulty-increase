@@ -29,6 +29,8 @@ class Agent:
         return [food for food in food_list if self.distance_to(food) <= self.sense]
 
     def distance_to(self, target):
+        if int(target[0]) != target[0] or int(target[1]) != target[1]:
+            raise ValueError("Invalid coordinates")
         return abs(self.x - target[0]) + abs(self.y - target[1])
     
     def eat(self):
