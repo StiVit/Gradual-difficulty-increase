@@ -1,4 +1,10 @@
 from deap import base, creator, tools, algorithms # type: ignore
+from app.neat_training.run_neat import run_neat
+from app.environment.environment import Plane
+from app.environment.agent import Agent
+from app.utils.settings import settings
+from app.utils.spawn_agent import spawn_agent
+import pickle
 import random
 
 creator.create("FitnessMax", base.Fitness, weights=(1.0,))
@@ -12,10 +18,17 @@ toolbox.register("individual", tools.initCycle, creator.Individual,
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 def evaluate(individual):
+    plane = Plane(settings.x_plane, settings.y_plane, 100)
     speed, sense = individual
+    best_model_path = "app/neat_training/winner.pkl"
+    with open(best_model_path, "rb") as f:
+        net = pickle.load(f)
+    agent = spawn_agent(0, 1, settings.x_plane, settings.y_plane, net=net)
+    while agent.energy > 0:
+        agent.decide_movement(plane)
     # Simulate agent behavior using NEAT-trained movement
     # Compute fitness based on performance
-    return speed * sense,
+    return (agent.energy // 100) * agent.eaten,
 
 toolbox.register("evaluate", evaluate)
 toolbox.register("mate", tools.cxBlend, alpha=0.5)
