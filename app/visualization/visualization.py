@@ -1,7 +1,7 @@
 import pygame
 import random
 import neat
-from app.simulation.environment import Plane
+from app.environment.environment import Plane
 from app.genetic_algorithm.train_deap import run_evolution
 from app.utils.settings import settings
 from app.utils.spawn_agent import spawn_agent

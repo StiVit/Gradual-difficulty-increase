@@ -1,4 +1,4 @@
-from app.simulation.agent import Agent
+from app.environment.agent import Agent
 import random
 import neat
 

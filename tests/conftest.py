@@ -1,6 +1,6 @@
 import pytest
-from app.simulation.agent import Agent
-from app.simulation.environment import Plane
+from app.environment.agent import Agent
+from app.environment.environment import Plane
 
 @pytest.fixture
 def agent():

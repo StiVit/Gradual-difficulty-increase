@@ -1,4 +1,3 @@
-import math
 from app.utils.settings import settings
 from app.utils.helpers import get_closest_edge, get_direction
 
@@ -23,6 +22,8 @@ class Agent:
                 self.y += self.speed if self.y <= settings.y_plane - self.speed else 0
             case 'd':
                 self.y -= self.speed if self.y >= self.speed else 0
+            case _:
+                raise ValueError("Invalid direction of movement")
         self.energy -= self.speed * max(1, self.sense // 100) # More speed and sense, more energy consumed
 
     def perceive_food(self, food_list):
@@ -39,6 +40,9 @@ class Agent:
             self.energy += 10
     
     def decide_movement(self, plane):
+        if not self.net:
+            return
+
         if self.energy <= 0:
             return
         
