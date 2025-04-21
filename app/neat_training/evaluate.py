@@ -8,7 +8,7 @@ from app.environment.environment import Plane
 from app.utils.logger import get_logger
 from app.utils.settings import settings
 from app.utils.helpers import get_closest_edge, get_direction
-from app.utils.spawn_agent import spawn_agent
+from app.utils.spawn_agent import spawn_agent_in_one_line
 
 evaluation_logger = get_logger("evaluation_logger")
 gen = 0
@@ -24,7 +24,7 @@ def eval_genomes(genomes, config):
     nets = []
     for genome_id, genome in genomes:
         net = neat.nn.FeedForwardNetwork.create(genome, config)
-        agent = spawn_agent(genome_id%100, n_agents, x_plane, y_plane)
+        agent = spawn_agent_in_one_line(genome_id%100, n_agents, x_plane, y_plane, genome)
         genome.fitness = 0
         agents.append((agent, genome_id, genome))
         nets.append(net)

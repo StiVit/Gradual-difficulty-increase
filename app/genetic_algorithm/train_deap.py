@@ -24,6 +24,8 @@ def evaluate(individual):
     with open(best_model_path, "rb") as f:
         net = pickle.load(f)
     agent = spawn_agent(0, 1, settings.x_plane, settings.y_plane, net=net)
+    agent.speed = speed
+    agent.sense = sense
     while agent.energy > 0:
         agent.decide_movement(plane)
     # Simulate agent behavior using NEAT-trained movement
