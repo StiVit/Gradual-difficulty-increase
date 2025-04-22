@@ -1,5 +1,5 @@
 from app.utils.logger import get_logger
-from app.visualization.visualization import visualize_game
+from app.visualization.game import visualize_game
 from app.neat_training.run_neat import run_neat
 
 if __name__ == "__main__":

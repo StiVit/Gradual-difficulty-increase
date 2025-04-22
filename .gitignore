@@ -4,4 +4,3 @@ __pycache__
 .idea/
 neat_checkpoints_*
 app.log
-show_game.py

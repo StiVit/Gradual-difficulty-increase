@@ -90,6 +90,6 @@ def visualize_game(winner, human_player = False):
         clock.tick(30)
     
     if human_player and player_agent:
-        fitness = 100 + player_agent.energy // 10 + player_agent.eaten * 100
+        fitness = player_agent.energy // 10 + player_agent.eaten * 100
         with open("player_fitness.txt", "w") as file:
             file.write(f"{fitness}")
