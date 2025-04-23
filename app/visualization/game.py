@@ -4,11 +4,12 @@ from app.environment.environment import Plane
 from app.genetic_algorithm.train_deap import run_evolution
 from app.utils.settings import settings
 from app.utils.spawn_agent import spawn_agent, spawn_agent_in_one_line
+from app.utils.helpers import get_closest_edge
 from app.environment.agent import Agent
 
 # best_traits = run_evolution()
         
-def visualize_game(winner, human_player = False):
+def visualize_game(winner, human_player = False, difficulty_increase = False):
     pygame.init()
     screen = pygame.display.set_mode((settings.x_plane, settings.x_plane))
     clock = pygame.time.Clock()
@@ -90,6 +91,11 @@ def visualize_game(winner, human_player = False):
         clock.tick(30)
     
     if human_player and player_agent:
-        fitness = player_agent.energy // 10 + player_agent.eaten * 100
+        fitness = 0
+        if player_agent.distance_to(get_closest_edge(player_agent, settings.x_plane, settings.y_plane)) < 15:
+            fitness = player_agent.energy // 10 + player_agent.eaten * 100
+
+        if difficulty_increase:
+            fitness += 50
         with open("player_fitness.txt", "w") as file:
             file.write(f"{fitness}")
